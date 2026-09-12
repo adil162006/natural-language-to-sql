@@ -1,0 +1,169 @@
+
+Project EcommerceDB {
+  database_type: "PostgreSQL"
+  Note: "Sample database for Natural Language to SQL Agent"
+}
+
+
+Table users {
+  id integer [pk, increment]
+  name varchar(100) [not null]
+  email varchar(150) [not null, unique]
+  city varchar(100)
+  created_at timestamp [not null]
+
+  Note: "Customers registered on the platform"
+}
+
+
+Table categories {
+  id integer [pk, increment]
+  name varchar(100) [not null, unique]
+
+  Note: "Product categories"
+}
+
+
+Table products {
+  id integer [pk, increment]
+  name varchar(200) [not null]
+  category_id integer [not null]
+  price decimal(10,2) [not null]
+  stock_quantity integer [not null]
+  created_at timestamp [not null]
+
+  Note: "Products available for purchase"
+}
+
+
+Table orders {
+  id integer [pk, increment]
+  user_id integer [not null]
+  order_date timestamp [not null]
+  status varchar(50) [not null]
+  total_amount decimal(12,2) [not null]
+
+  Note: "Orders placed by users"
+}
+
+
+Table order_items {
+  id integer [pk, increment]
+  order_id integer [not null]
+  product_id integer [not null]
+  quantity integer [not null]
+  unit_price decimal(10,2) [not null]
+
+  Note: "Individual products inside an order"
+}
+
+
+Table payments {
+  id integer [pk, increment]
+  order_id integer [not null]
+  payment_method varchar(50) [not null]
+  payment_status varchar(50) [not null]
+  paid_at timestamp
+
+  Note: "Payment information for orders"
+}
+
+
+Table addresses {
+  id integer [pk, increment]
+  user_id integer [not null]
+  address_line varchar(255) [not null]
+  city varchar(100) [not null]
+  state varchar(100) [not null]
+  pincode varchar(10) [not null]
+  address_type varchar(30) [not null]
+
+  Note: "Customer shipping and billing addresses"
+}
+
+
+Table shipments {
+  id integer [pk, increment]
+  order_id integer [not null]
+  address_id integer [not null]
+  courier_name varchar(100)
+  tracking_number varchar(100)
+  shipment_status varchar(50) [not null]
+  shipped_at timestamp
+  delivered_at timestamp
+
+  Note: "Order shipment and delivery information"
+}
+
+
+Table reviews {
+  id integer [pk, increment]
+  user_id integer [not null]
+  product_id integer [not null]
+  rating integer [not null]
+  review_text text
+  created_at timestamp [not null]
+
+  Note: "Customer reviews and product ratings"
+}
+
+
+Table wishlists {
+  id integer [pk, increment]
+  user_id integer [not null]
+  product_id integer [not null]
+  added_at timestamp [not null]
+
+  Note: "Products saved by customers"
+}
+
+
+Table coupons {
+  id integer [pk, increment]
+  code varchar(50) [not null, unique]
+  discount_type varchar(20) [not null]
+  discount_value decimal(10,2) [not null]
+  min_order_amount decimal(12,2)
+  expires_at timestamp
+  is_active boolean [not null]
+
+  Note: "Discount coupons available for customers"
+}
+
+
+Table product_coupons {
+  id integer [pk, increment]
+  product_id integer [not null]
+  coupon_id integer [not null]
+
+  Note: "Products eligible for specific coupons"
+}
+
+
+Ref: products.category_id > categories.id
+
+Ref: orders.user_id > users.id
+
+Ref: order_items.order_id > orders.id
+
+Ref: order_items.product_id > products.id
+
+Ref: payments.order_id - orders.id
+
+Ref: addresses.user_id > users.id
+
+Ref: shipments.order_id - orders.id
+
+Ref: shipments.address_id > addresses.id
+
+Ref: reviews.user_id > users.id
+
+Ref: reviews.product_id > products.id
+
+Ref: wishlists.user_id > users.id
+
+Ref: wishlists.product_id > products.id
+
+Ref: product_coupons.product_id > products.id
+
+Ref: product_coupons.coupon_id > coupons.id
